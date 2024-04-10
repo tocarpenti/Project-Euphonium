@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class player : Area2D
+public partial class Player : Area2D
 {
 	[Export]
 	public int speed = 400;
@@ -10,9 +10,13 @@ public partial class player : Area2D
 
 	private AnimatedSprite2D animator;
 
+	private CollisionShape2D collidor;
+
 	override public void _Ready () {
 		screen_size = GetViewportRect().Size;
 		animator= GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		collidor= GetNode<CollisionShape2D>("CollisionShape2D");
+		Hide();
 	}
 
 	override public void _Process (double delta) {
@@ -48,5 +52,21 @@ public partial class player : Area2D
 		else if (velocity.Y != 0){
 			animator.Animation = "up";
 		}
+	}
+
+	[Signal]
+	public delegate void HitEventHandler();
+
+	private void OnBodyEntered(Node2D body){
+		Hide();
+		EmitSignal(SignalName.Hit);
+		collidor.SetDeferred("disabled", true);
+	}
+
+
+	public void Start(Vector2 pos) {
+		Position = pos;
+		Show();
+		collidor.Disabled = false;
 	}
 }
