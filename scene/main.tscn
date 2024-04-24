@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://51ia2k581snj"]
+[gd_scene load_steps=6 format=3 uid="uid://51ia2k581snj"]
 
 [ext_resource type="PackedScene" uid="uid://lsdw8k54o5eu" path="res://scene/player.tscn" id="1_nvgvg"]
-[ext_resource type="Script" path="res://scripts/main.cs" id="1_wc6eh"]
+[ext_resource type="Script" path="res://scripts/Main.cs" id="1_v4iv6"]
 [ext_resource type="PackedScene" uid="uid://nnebbm1k82j8" path="res://scene/enemy.tscn" id="2_gv5jy"]
+[ext_resource type="PackedScene" uid="uid://bgit24ye367x" path="res://scene/HUD.tscn" id="4_t1ft8"]
 
 [sub_resource type="Curve2D" id="Curve2D_7ugdr"]
 _data = {
@@ -11,7 +12,7 @@ _data = {
 point_count = 6
 
 [node name="Main" type="Node"]
-script = ExtResource("1_wc6eh")
+script = ExtResource("1_v4iv6")
 enemyScene = ExtResource("2_gv5jy")
 
 [node name="Player" parent="." instance=ExtResource("1_nvgvg")]
@@ -35,7 +36,9 @@ curve = SubResource("Curve2D_7ugdr")
 position = Vector2(1152, 648)
 rotation = -1.5708
 
-[connection signal="Hit" from="Player" to="." method="GameOver"]
+[node name="HUD" parent="." instance=ExtResource("4_t1ft8")]
+
 [connection signal="timeout" from="EnemyTimer" to="." method="OnEnemyTimerTimeout"]
 [connection signal="timeout" from="ScoreTimer" to="." method="OnScoreTimerTimeout"]
 [connection signal="timeout" from="StartTimer" to="." method="OnStartTimerTimeout"]
+[connection signal="StartGame" from="HUD" to="." method="NewGame"]

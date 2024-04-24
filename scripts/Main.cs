@@ -1,7 +1,8 @@
 using Godot;
 using System;
+using System.Runtime.InteropServices;
 
-public partial class main : Node
+public partial class Main : Node
 {
 	[Export]
 	public PackedScene enemyScene;
@@ -11,11 +12,13 @@ public partial class main : Node
 	private Marker2D startPosition;
     private Timer enemyTimer;
     private Timer scoreTimer;
-    private Timer startimer;
+    private Timer startTimer;
+    private HUD hud;
 
 
 
     // Called when the node enters the scene tree for the first time.
+
 
 
     public override void _Ready()
@@ -24,7 +27,8 @@ public partial class main : Node
 		startPosition = GetNode<Marker2D>("StartPosition");
 		enemyTimer= GetNode<Timer>("EnemyTimer");
 		scoreTimer= GetNode<Timer>("ScoreTimer");
-		startimer= GetNode<Timer>("Startimer");
+		startTimer= GetNode<Timer>("StartTimer");
+		hud= GetNode<HUD>("HUD");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -35,12 +39,15 @@ public partial class main : Node
 	private void GameOver() {
 		scoreTimer.Stop();
 		enemyTimer.Stop();
+		hud.ShowGameOver();
 	}
 
 	private void NewGame() {
 		score = 0;
 		player.Start(startPosition.Position);
-		startimer.Start();
+		startTimer.Start();
+		hud.UpdateScore(score);
+		hud.ShowMessage("GET READY !");
 	}
 
 	private void OnStartTimerTimeout() {
@@ -50,9 +57,21 @@ public partial class main : Node
 
 	private void OnScoreTimerTimeout() {
 		score ++;
+		hud.UpdateScore(score);
+
 	}
 
 	private void OnEnemyTimerTimeout() {
-		
+		Enemy mob = enemyScene.Instantiate<Enemy>();
+		PathFollow2D mobSpawnLocation = GetNode<PathFollow2D>("EnemyPath/EnemySpawnLocation");
+
+		mobSpawnLocation.ProgressRatio = GD.Randf();
+		float direction = (float)(mobSpawnLocation.Rotation - Math.PI / 2);
+		Vector2 velocity = new Vector2((float)GD.RandRange(150.0, 250.0), 0f);
+
+		mob.Position = mobSpawnLocation.Position;
+		mob.LinearVelocity = velocity.Rotated(direction);
+
+		AddChild(mob);
 	}
 }
